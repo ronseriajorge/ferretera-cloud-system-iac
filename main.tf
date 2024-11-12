@@ -22,3 +22,10 @@ module "Firestore" {
     db_usuarios = var.db_usuarios
     depends_on    = [module.APIs]  # Asegura que el módulo de APIs se ejecute primero
 }
+
+module "CloudFunction" {
+    source = "./modules/CloudFunction"  
+    region = var.region
+    project_id = var.project_id
+    depends_on    = [module.APIs, module.Firestore]  # Asegura que el módulo de APIs  y firestpre se ejecute primero
+}

@@ -31,3 +31,15 @@ resource "google_project_service" "storage" {
   service = "storage.googleapis.com"
   disable_dependent_services = true
 }
+
+# Habilita la API de Cloud build
+resource "google_project_service" "cloudbuild" {
+  project = var.project_id
+  service = "cloudbuild.googleapis.com"
+}
+
+resource "google_project_iam_member" "compute_service_account_logging" {
+  project = "terraform-test-441302"  # Reemplaza con el ID de tu proyecto
+  role    = "roles/logging.logWriter"
+  member  = "serviceAccount:511845341063-compute@developer.gserviceaccount.com"
+}
