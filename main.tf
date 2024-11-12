@@ -15,3 +15,10 @@ module "Database" {
     region = var.region
     depends_on    = [module.APIs]  # Asegura que el módulo de APIs se ejecute primero
 }
+
+module "Firestore" {
+    source = "./modules/Firestore"  
+    region = var.region
+    db_usuarios = var.db_usuarios
+    depends_on    = [module.APIs]  # Asegura que el módulo de APIs se ejecute primero
+}
