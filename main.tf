@@ -27,5 +27,5 @@ module "CloudFunction" {
     source = "./modules/CloudFunction"  
     region = var.region
     project_id = var.project_id
-    depends_on    = [module.APIs, module.Firestore]  # Asegura que el módulo de APIs  y firestpre se ejecute primero
+    depends_on    = [module.APIs]  # Asegura que el módulo de APIs  y firestpre se ejecute primero
 }
