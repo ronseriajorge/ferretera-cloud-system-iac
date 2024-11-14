@@ -16,6 +16,16 @@ module "Database" {
     depends_on    = [module.APIs]  # Asegura que el módulo de APIs se ejecute primero
 }
 
+module "Registry" {
+  source = "./modules/Registry"
+  depends_on = [ module.APIs ]
+}
+
+module "docker_commands" {
+    source = "./modules/DockerCommands"
+    depends_on    = [module.Registry]
+}
+
 module "Firestore" {
     source = "./modules/Firestore"  
     region = var.region
@@ -34,6 +44,7 @@ module "CloudRun" {
   source = "./modules/CloudRun"  
   region = var.region
   inventariodb_ip_address =  module.Database.inventariodb_ip_address
+  usuarios-ms-url = module.CloudFunction.url-usuarios-ms
   # Espera a que la imagen esté disponible antes de crear el servicio
-  depends_on = [module.APIs, module.Database]
+  depends_on = [module.APIs, module.Database, module.docker_commands]
 }

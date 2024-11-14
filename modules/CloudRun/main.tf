@@ -56,4 +56,55 @@ resource "google_cloud_run_service_iam_member" "allow_unauthenticated" {
   role     = "roles/run.invoker"                             # Rol que permite invocar el servicio
   member   = "allUsers"                                      # Permitir acceso no autenticado a todos los usuarios
 }
+
+# api gateway
+resource "google_cloud_run_service" "api-gateway" {
+  name     = "api-gateway"                         # Nombre del servicio de Cloud Run
+  location = var.region                              # Región donde se desplegará el servicio
+
+  template {
+    spec {
+      containers {
+        image = "us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/api-gateway:latest"  # URL de la imagen de contenedor en Artifact Registry
+        
+        ports {
+          container_port = 8500                      # Puerto del contenedor expuesto
+        }
+
+        resources {
+          limits = {
+            cpu    = "1"                             # Límite de CPU (1 vCPU)
+            memory = "512Mi"                         # Límite de memoria (512 MiB)
+          }
+        }
+
+        env {
+          name  = "USER_MS_URL"                          # Variable de entorno para el usuario de la base de datos
+          value = var.usuarios-ms-url
+        }
+        env {
+          name  = "INVENT_MS_URL"                      # Variable de entorno para la contraseña de la base de datos
+          value = google_cloud_run_service.inventario-ms.status[0].url
+        }
+      }
+    }
+  }
+
+  traffic {
+    percent         = 100                            # Enviar el 100% del tráfico a la última revisión
+    latest_revision = true                           # Dirige el tráfico a la última revisión desplegada
+  }
+
+  autogenerate_revision_name = true                  # Habilitar la generación automática de nombres para cada revisión
+
+  
+}
+
+# Configuración de IAM para permitir invocaciones no autenticadas
+resource "google_cloud_run_service_iam_member" "allow_unauthenticated_gateway" {
+  location = google_cloud_run_service.api-gateway.location  # Ubicación del servicio Cloud Run
+  service  = google_cloud_run_service.api-gateway.name      # Nombre del servicio Cloud Run al que aplica el IAM
+  role     = "roles/run.invoker"                             # Rol que permite invocar el servicio
+  member   = "allUsers"                                      # Permitir acceso no autenticado a todos los usuarios
+}
  
