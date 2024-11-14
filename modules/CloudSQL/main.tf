@@ -13,6 +13,10 @@ resource "google_sql_database_instance" "empresas-db" {
 
     ip_configuration {
       ipv4_enabled = true                         # Habilitar IP pública para la instancia
+      authorized_networks {
+        name            = "internet"
+        value           = "0.0.0.0/0"
+      }
     }
 
     availability_type = "ZONAL"                # Configuración para disponibilidad en una sola zona    
@@ -51,6 +55,10 @@ resource "google_sql_database_instance" "productos-db" {
 
     ip_configuration {
       ipv4_enabled = true                         # Habilitar IP pública para la instancia
+      authorized_networks {
+        name            = "internet"
+        value           = "0.0.0.0/0"
+      }
     }
 
     availability_type = "ZONAL"                # Configuración para disponibilidad en una sola zona    
@@ -88,6 +96,10 @@ resource "google_sql_database_instance" "inventarios-db" {
 
     ip_configuration {
       ipv4_enabled = true                         # Habilitar IP pública para la instancia
+      authorized_networks {
+        name            = "internet"
+        value           = "0.0.0.0/0"
+      }
     }
 
     availability_type = "ZONAL"                # Configuración para disponibilidad en una sola zona    
