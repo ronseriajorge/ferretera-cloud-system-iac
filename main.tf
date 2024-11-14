@@ -29,3 +29,11 @@ module "CloudFunction" {
     project_id = var.project_id
     depends_on    = [module.APIs]  # Asegura que el módulo de APIs  y firestpre se ejecute primero
 }
+
+module "CloudRun" {
+  source = "./modules/CloudRun"  
+  region = var.region
+  inventariodb_ip_address =  module.Database.inventariodb_ip_address
+  # Espera a que la imagen esté disponible antes de crear el servicio
+  depends_on = [module.APIs, module.Database]
+}
