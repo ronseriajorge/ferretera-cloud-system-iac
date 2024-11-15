@@ -1,9 +1,10 @@
 import functions_framework
 from google.cloud import firestore
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 
 # Inicializa el cliente Firestore
 db = firestore.Client(project="terraform-test-441302", database="usuariosdb")
+
 @functions_framework.http
 def user_management(request):
     try:
@@ -18,50 +19,57 @@ def user_management(request):
             user_id = request.args.get('id')
             
             if user_id:
-                # Obtener un usuario específico
                 user_doc = users_collection.document(user_id).get()
                 if user_doc.exists:
-                    # Retornar el usuario y el ID
                     user_data = user_doc.to_dict()
-                    user_data['id'] = user_doc.id  # Agregar el ID generado al dict
-                    return jsonify(user_data), 200
+                    user_data['id'] = user_doc.id
+                    response = make_response(jsonify(user_data), 200)
                 else:
-                    return jsonify({'error': 'Usuario no encontrado'}), 404
+                    response = make_response(jsonify({'error': 'Usuario no encontrado'}), 404)
             else:
-                # Obtener todos los usuarios
                 users = []
                 for doc in users_collection.stream():
                     user_data = doc.to_dict()
-                    user_data['id'] = doc.id  # Agregar el ID generado a cada usuario
+                    user_data['id'] = doc.id
                     users.append(user_data)
-                return jsonify(users), 200
+                response = make_response(jsonify(users), 200)
 
         elif request.method == 'POST':
-            # Agregar usuario
             if not data:
-                return jsonify({'error': 'Datos del usuario son requeridos'}), 400
-            doc_ref = users_collection.add(data)
-            # Retornar el ID del usuario recién creado
-            return jsonify({'message': 'Usuario agregado', 'id': doc_ref[1].id}), 201
+                response = make_response(jsonify({'error': 'Datos del usuario son requeridos'}), 400)
+            else:
+                doc_ref = users_collection.add(data)
+                response = make_response(jsonify({'message': 'Usuario agregado', 'id': doc_ref[1].id}), 201)
 
         elif request.method == 'PUT':
-            # Actualizar usuario
             user_id = data.get('id')
             if not user_id:
-                return jsonify({'error': 'ID de usuario requerido para actualizar'}), 400
-            users_collection.document(user_id).set(data, merge=True)
-            return jsonify({'message': 'Usuario actualizado'}), 200
+                response = make_response(jsonify({'error': 'ID de usuario requerido para actualizar'}), 400)
+            else:
+                users_collection.document(user_id).set(data, merge=True)
+                response = make_response(jsonify({'message': 'Usuario actualizado'}), 200)
 
         elif request.method == 'DELETE':
-            # Eliminar usuario
             user_id = data.get('id')
             if not user_id:
-                return jsonify({'error': 'ID de usuario requerido para eliminar'}), 400
-            users_collection.document(user_id).delete()
-            return jsonify({'message': 'Usuario eliminado'}), 200
+                response = make_response(jsonify({'error': 'ID de usuario requerido para eliminar'}), 400)
+            else:
+                users_collection.document(user_id).delete()
+                response = make_response(jsonify({'message': 'Usuario eliminado'}), 200)
 
         else:
-            return jsonify({'error': 'Método no permitido'}), 405
+            response = make_response(jsonify({'error': 'Método no permitido'}), 405)
+
+        # Agregar encabezados de CORS a la respuesta
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+
+        return response
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        response = make_response(jsonify({'error': str(e)}), 500)
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+        return response

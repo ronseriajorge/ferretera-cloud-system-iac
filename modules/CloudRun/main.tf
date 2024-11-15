@@ -6,7 +6,7 @@ resource "google_cloud_run_service" "inventario-ms" {
   template {
     spec {
       containers {
-        image = "us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/inventario-ms:latest"  # URL de la imagen de contenedor en Artifact Registry
+        image = "us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/inventario-ms:v2"  # URL de la imagen de contenedor en Artifact Registry
         
         ports {
           container_port = 8000                      # Puerto del contenedor expuesto
@@ -65,7 +65,7 @@ resource "google_cloud_run_service" "api-gateway" {
   template {
     spec {
       containers {
-        image = "us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/api-gateway:latest"  # URL de la imagen de contenedor en Artifact Registry
+        image = "us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/api-gateway:v2"  # URL de la imagen de contenedor en Artifact Registry
         
         ports {
           container_port = 8500                      # Puerto del contenedor expuesto
