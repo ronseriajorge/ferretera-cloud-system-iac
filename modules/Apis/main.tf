@@ -39,7 +39,13 @@ resource "google_project_service" "cloudbuild" {
 }
 
 resource "google_project_iam_member" "compute_service_account_logging" {
-  project = "terraform-test-441302"  # Reemplaza con el ID de tu proyecto
+  project = var.project_id  
   role    = "roles/logging.logWriter"
   member  = "serviceAccount:511845341063-compute@developer.gserviceaccount.com"
+}
+
+resource "google_project_service" "kubernetes_engine" {
+  project = var.project_id 
+  service = "container.googleapis.com"
+
 }

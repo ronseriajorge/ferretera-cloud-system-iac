@@ -14,4 +14,12 @@ resource "null_resource" "docker_commands" {
   provisioner "local-exec" {
     command = "docker push us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/inventario-ms"
   }
+
+  provisioner "local-exec" {
+    command = "docker tag productos-ms us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/productos-ms:v1"
+  }
+
+  provisioner "local-exec" {
+    command = "docker push us-east4-docker.pkg.dev/terraform-test-441302/microservices-repository/productos-ms:v1"
+  }
 }
